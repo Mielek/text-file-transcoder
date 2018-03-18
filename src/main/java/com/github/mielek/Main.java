@@ -70,7 +70,11 @@ public class Main {
                 if(cliLine.hasOption(encodeOpt.getOpt())){
                     encode = Charset.forName(cliLine.getOptionValue(encodeOpt.getOpt()));
                 }
-                FileTranscodeUtils.transcodeFile(source,decode,target,encode);
+                if(!source.equals(target)){
+                    FileTranscodeUtils.transcodeFile(source,decode,target,encode);
+                } else {
+                    System.err.println("File to transcode cannot be the same as result file");
+                }
             }catch (IOException e){
                 System.err.println(e.getMessage());
             }catch (UnsupportedCharsetException e){
