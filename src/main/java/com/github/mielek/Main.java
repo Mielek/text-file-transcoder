@@ -1,7 +1,12 @@
 package com.github.mielek;
 
 import org.apache.commons.cli.*;
+
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main {
     private static final Option fileOpt = Option.builder("f")
@@ -12,15 +17,7 @@ public class Main {
             .argName("FILE")
             .desc("Sets text file to transcode.")
             .build();
-    private static final Option dirOpt = Option.builder("d")
-            .longOpt("dir")
-            .required()
-            .hasArg()
-            .type(String.class)
-            .argName("DIR")
-            .desc("Sets directory of files to transcode.")
-            .build();
-    private static final Option decodeOpt = Option.builder()
+    private static final Option decodeOpt = Option.builder("d")
             .longOpt("charset-decode")
             .required()
             .hasArg()
@@ -28,27 +25,19 @@ public class Main {
             .argName("CHARSET")
             .desc("Sets charset of the file.")
             .build();
-    private static final Option encodeOpt = Option.builder()
+    private static final Option encodeOpt = Option.builder("e")
             .longOpt("charset-encode")
             .hasArg()
             .type(String.class)
             .argName("CHARSET")
             .desc("Sets charset for result file. Default value is \"UTF-8\".")
             .build();
-    private static final Option renameOpt = Option.builder()
+    private static final Option renameOpt = Option.builder("r")
+            .required()
             .longOpt("rename")
-            .desc("Used with -f, --file option. Rename result file.")
-            .build();
-    private static final Option recursiveOpt = Option.builder("r")
-            .desc("Used with -d, --dir option. Transcode files in child catalogs.")
-            .build();
-    private static final Option threadsOpt = Option.builder("t")
-            .longOpt("threads")
-            .required(false)
             .hasArg()
-            .argName("NUMBER")
-            .type(Integer.class)
-            .desc("Sets number of threads used to transcode file.")
+            .argName("NEW_NAME")
+            .desc("Rename result file.")
             .build();
     private static final Option helpOpt = Option.builder().longOpt("help")
             .desc("Shows help.")
@@ -71,18 +60,22 @@ public class Main {
                 showCharsets();
                 return;
             }
-            OptionGroup group = new OptionGroup().addOption(fileOpt).addOption(dirOpt);
-            group.setRequired(true);
-            Options cliOptions = new Options().addOptionGroup(group).addOption(decodeOpt).addOption(encodeOpt).addOption(renameOpt).addOption(threadsOpt);
+            Options cliOptions = new Options().addOption(fileOpt).addOption(decodeOpt).addOption(renameOpt).addOption(encodeOpt);
             cliLine = parser.parse(cliOptions, args, true);
             try {
-                if (cliLine.hasOption(fileOpt.getOpt())) {
-                    FileTranscodeUtils.transcodeFile();
-                } else if (cliLine.hasOption(dirOpt.getLongOpt())) {
-                    FileTranscodeUtils.transcodeFilesInDir();
+                Path source = Paths.get(cliLine.getOptionValue(fileOpt.getOpt()));
+                Path target = Paths.get(cliLine.getOptionValue(renameOpt.getOpt()));
+                Charset decode = Charset.forName(cliLine.getOptionValue(decodeOpt.getOpt()));
+                Charset encode = Charset.forName("UTF-8");
+                if(cliLine.hasOption(encodeOpt.getOpt())){
+                    encode = Charset.forName(cliLine.getOptionValue(encodeOpt.getOpt()));
                 }
-            }catch (TranscodeException e){
-
+                FileTranscodeUtils.transcodeFile(source,decode,target,encode);
+            }catch (IOException e){
+                System.err.println(e.getMessage());
+            }catch (UnsupportedCharsetException e){
+                System.err.println(e.getMessage());
+                showCharsets();
             }
         } catch (ParseException e) {
             System.err.println("Error parsing arguments. " + e.getMessage());
@@ -96,14 +89,11 @@ public class Main {
     }
 
     private static void showHelp() {
-        OptionGroup group = new OptionGroup().addOption(fileOpt).addOption(dirOpt);
-        group.setRequired(true);
         Options all = new Options()
-                .addOptionGroup(group)
+                .addOption(fileOpt)
                 .addOption(decodeOpt)
-                .addOption(encodeOpt)
                 .addOption(renameOpt)
-                .addOption(threadsOpt)
+                .addOption(encodeOpt)
                 .addOption(listOpt)
                 .addOption(helpOpt);
         new HelpFormatter().printHelp("transcoder", "TODO: header", all, "TODO: footer",true);

@@ -1,0 +1,5 @@
+Test file encoded in Cp1250 / Windows-1250
+
+$%some test';¹êæ³!_)*($!+546813test
+af
+224124124asdasa
