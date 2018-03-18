@@ -36,7 +36,7 @@ mvn exec:java -Dexec.args="--help"
 mvn exec:java -Dexec.args="--list-charset
 ```
 
-##### Invocation example
+##### Transcoding example
 ```
 mvn exec:java -Dexec.args="-f test-file.txt -d Cp1250 -r result-file.txt -e UTF-8"
 ```
