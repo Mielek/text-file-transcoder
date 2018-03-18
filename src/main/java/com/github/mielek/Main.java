@@ -100,6 +100,6 @@ public class Main {
                 .addOption(encodeOpt)
                 .addOption(listOpt)
                 .addOption(helpOpt);
-        new HelpFormatter().printHelp("transcoder", "TODO: header", all, "TODO: footer",true);
+        new HelpFormatter().printHelp("transcoder", "Simple text file transcoding application.", all, "Created by Rafal Mielowski",true);
     }
 }
