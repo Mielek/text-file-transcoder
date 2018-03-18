@@ -31,9 +31,9 @@ You can run application from jar file or directly from maven. This examples are 
 mvn exec:java -Dexec.args="--help"
 ```
 
-##### Charset list
+##### Lists charsets
 ```
-mvn exec:java -Dexec.args="--list-charset
+mvn exec:java -Dexec.args="--list-charset"
 ```
 
 ##### Transcoding example
