@@ -14,7 +14,7 @@ Installation steps:
 ```
 git clone https://github.com/Mielek/text-file-transcoder.git
 cd text-file-transcoder
-mvn clean build
+mvn clean compile
 ```
 
 To create runnable jar file:
